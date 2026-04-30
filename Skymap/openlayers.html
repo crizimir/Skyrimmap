@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Skymap</title>
+<title>Skymap2</title>
 <meta charset="utf-8">
 <meta http-equiv="imagetoolbar" content="no"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
@@ -9,8 +9,8 @@
 <style type="text/css">
 html, body { margin:0; padding: 0; height: 100%; width: 100%; }
 body { width:100%; height:100%; background: #ffffff; }
-#map { position: absolute; height: 100%; width: 100%; background-color: #FFFFFF; }
-#slider { position: absolute; top: 30px; right: 10px; }
+#map { position: absolute; height: 100%; width: 100%; background-color: #000000; }
+#slider { position: absolute; top: 10px; right: 10px; }
 </style>
 <link rel="stylesheet" href="https://cdn.maptiler.com/ol/v6.12.0/ol.css" type="text/css">
 <script src="https://cdnjs.cloudflare.com/polyfill/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,fetch,Function.prototype.bind,es5&flags=always,gated&unknown=polyfill" type="text/javascript"></script>
@@ -20,19 +20,21 @@ body { width:100%; height:100%; background: #ffffff; }
 <div id="map"></div>
 <input id="slider" type="range" min="0" max="1" step="0.1" value="1" oninput="layer.setOpacity(this.value)">
 <script type="text/javascript">
-var mapExtent = [13.17640000, 44.52020000, 13.45590000, 44.71480000];
-var mapMinZoom = 9;
-var mapMaxZoom = 14;
-var tileExtent = [-180.00000000, -90.00000000, 180.00000000, 90.00000000];
-// Proj4js definition (verify code at http://epsg.io/4326);
-// proj4.defs('EPSG:4326', '+proj=longlat +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +no_defs');
+var mapExtent = [0.00000000, -10936.00000000, 15360.00000000, 0.00000000];
+var mapMinZoom = 0;
+var mapMaxZoom = 4;
+var mapMaxResolution = 2.00000000;
+var tileExtent = [0.00000000, -10936.00000000, 15360.00000000, 0.00000000];
+var tileWidth = 512;
+var tileHeight = 512;
 
 var mapResolutions = [];
-for (var z = 0; z <= 14; z++) {
-  mapResolutions.push(0.70312500 / Math.pow(2, z));
+for (var z = 0; z <= mapMaxZoom; z++) {
+  mapResolutions.push(Math.pow(2, mapMaxZoom - z) * mapMaxResolution);
 }
 
 var mapTileGrid = new ol.tilegrid.TileGrid({
+  tileSize: [tileWidth, tileHeight],
   extent: tileExtent,
   minZoom: mapMinZoom,
   resolutions: mapResolutions
@@ -41,7 +43,7 @@ var mapTileGrid = new ol.tilegrid.TileGrid({
 var layer = new ol.layer.Tile({
   source: new ol.source.XYZ({
     attributions: '<a href="https://www.maptiler.com/engine/">Rendered with MapTiler Engine</a>, non-commercial use only',
-    projection: 'EPSG:4326',
+    projection: 'PIXELS',
     tileGrid: mapTileGrid,
     tilePixelRatio: 1.00000000,
     url: "{z}/{x}/{y}.jpg",
@@ -54,14 +56,13 @@ var map = new ol.Map({
     layer,
   ],
   view: new ol.View({
-    projection: ol.proj.get('EPSG:4326'),
+    projection: ol.proj.get('PIXELS'),
     extent: mapExtent,
     maxResolution: mapTileGrid.getResolution(mapMinZoom),
     constrainOnlyCenter: true
   })
 });
 map.getView().fit(mapExtent, map.getSize());
-map.addControl(new ol.control.MousePosition());
 </script>
 </body>
 </html>
